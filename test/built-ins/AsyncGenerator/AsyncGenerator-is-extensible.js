@@ -5,6 +5,6 @@ description: >
   %AsyncGeneratorFunction% is extensible
 ---*/
 
-var AsyncGeneratorFunction = async function() { }.constructor;
+var AsyncGeneratorFunction = async function*() { }.constructor;
 AsyncGeneratorFunction.x = 1;
 assert.sameValue(AsyncGeneratorFunction.x, 1);
