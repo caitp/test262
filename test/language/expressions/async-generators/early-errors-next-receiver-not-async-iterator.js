@@ -5,10 +5,11 @@
 author: Benjamin Gruenbaum <benjamingr@gmail.com>
 esid: pending
 description: >
-  next() throws a TypeError when receiver is not an AsyncGenerator instance:
-negative:
-  phase: early
-  type: TypeError
+  next() rejects with a TypeError when receiver is not an AsyncGenerator instance:
 ---*/
 
-(async function*() {})().next.call((function*() {})()); 
+(async function*() {})().next.call((function*() {})()).then(function() {
+    throw new Test262Error("should not have resolved");    
+}, function(err) {
+    assert(err instanceof TypeError);
+}).then($DONE, $DONE);
