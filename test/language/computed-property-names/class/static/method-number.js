@@ -1,4 +1,4 @@
-// Copyright (C) Copyright 2014 the V8 project authors. All rights reserved.
+// Copyright (C) 2014 the V8 project authors. All rights reserved.
 // This code is governed by the BSD license found in the LICENSE file.
 /*---
 es6id: 12.2.5
@@ -21,6 +21,6 @@ assert(
   "`compareArray(Object.keys(C), [])` returns `true`"
 );
 assert(
-  compareArray(Object.getOwnPropertyNames(C), ['1', '2', 'length', 'name', 'prototype', 'a', 'c']),
-  "`compareArray(Object.getOwnPropertyNames(C), ['1', '2', 'length', 'name', 'prototype', 'a', 'c'])` returns `true`"
+  compareArray(Object.getOwnPropertyNames(C), ['1', '2', 'length', 'prototype', 'a', 'c', 'name']),
+  "`compareArray(Object.getOwnPropertyNames(C), ['1', '2', 'length', 'prototype', 'a', 'c', 'name'])` returns `true`"
 );

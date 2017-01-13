@@ -15,14 +15,14 @@ import sys
 
 f = None
 try:
-  (f, pathname, description) = imp.find_module("monkeyYaml", [os.path.join(os.getcwd(), "../")])
-  module = imp.load_module("monkeyYaml", f, pathname, description)
-  monkeyYaml = module
+    (f, pathname, description) = imp.find_module("monkeyYaml", [os.path.join(os.getcwd(), "../")])
+    module = imp.load_module("monkeyYaml", f, pathname, description)
+    monkeyYaml = module
 except:
-  raise ImportError("Cannot load monkeyYaml")
+    raise ImportError("Cannot load monkeyYaml")
 finally:
-  if f:
-    f.close()
+    if f:
+        f.close()
 
 #import monkeyYaml
 
@@ -58,13 +58,33 @@ class TestMonkeyYAMLParsing(unittest.TestCase):
         self.assertEqual(lines, [])
         self.assertEqual(value, yaml.load(y))
 
-    def test_Multiline_1(self):
+    def test_Multiline_2(self):
         lines = [" foo", " bar"]
         value = ">"
         y = "\n".join([value] + lines)
         (lines, value) = monkeyYaml.myMultiline(lines, value)
         self.assertEqual(lines, [])
         self.assertEqual(value, yaml.load(y))
+
+    def test_Multiline_3(self):
+        lines = ["  foo", "  bar"]
+        value = ">"
+        y = "\n".join([value] + lines)
+        (lines, value) = monkeyYaml.myMultiline(lines, value)
+        self.assertEqual(lines, [])
+        self.assertEqual(value, yaml.load(y))
+
+    def test_Multiline_4(self):
+        lines = ["    foo", "    bar", "  other: 42"]
+        value = ">"
+        (lines, value) = monkeyYaml.myMultiline(lines, value)
+        self.assertEqual(lines, ["  other: 42"])
+        self.assertEqual(value, "foo bar")
+
+    def test_Multiline_5(self):
+        lines = ["info: |", "  attr: this is a string (not nested yaml)", ""]
+        y = "\n".join(lines)
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
 
     def test_myLeading(self):
         self.assertEqual(2, monkeyYaml.myLeadingSpaces("  foo"))
@@ -83,14 +103,108 @@ class TestMonkeyYAMLParsing(unittest.TestCase):
         y = "foo:\n - bar\n - baz"
         self.assertEqual(monkeyYaml.load(y), yaml.load(y))
 
-    def test_mulineline_list2(self):
+    def test_multiline_list2(self):
         self.assertEqual(monkeyYaml.myRemoveListHeader(2, "  - foo"), "foo")
 
-    def test_mulineline_list3(self):
+    def test_multiline_list3(self):
         (lines, value) = monkeyYaml.myMultilineList([" - foo", " - bar", "baz: bletch"], "")
         self.assertEqual(lines, ["baz: bletch"])
         self.assertEqual(value, ["foo", "bar"])
 
+    def test_multiline_list_carriage_return(self):
+        y = "foo:\r\n - bar\r\n - baz"
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_oneline_indented(self):
+        y = "  foo: bar\n  baz: baf\n"
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+
+    def test_indentation_215(self):
+        self.maxDiff = None
+        y = """
+  description: >
+      The method should exist on the Array prototype, and it should be writable
+      and configurable, but not enumerable.
+  includes: [propertyHelper.js]
+  es6id: 22.1.3.13
+ """
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_indentation_215_2(self):
+        self.maxDiff = None
+        y = """
+  description: >
+   The method should exist
+  includes: [propertyHelper.js]
+  es6id: 22.1.3.13
+ """
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_line_folding(self):
+        self.maxDiff = None
+        y = """
+description: aaa
+             bbb
+es6id:  19.1.2.1
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_line_folding_2(self):
+        self.maxDiff = None
+        y = """
+description: ccc
+
+             ddd
+
+es6id:  19.1.2.1
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_line_folding_3(self):
+        self.maxDiff = None
+        y = """
+description: eee
+
+
+             fff
+es6id:  19.1.2.1
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_line_folding_4(self):
+        self.maxDiff = None
+        y = """
+description: ggg
+
+             hhh
+             iii
+
+             jjj
+es6id:  19.1.2.1
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_nested_1(self):
+        y = """
+es61d: 19.1.2.1
+negative:
+    stage: early
+    type: ReferenceError
+description: foo
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
+
+    def test_nested_2(self):
+        y = """
+es61d: 19.1.2.1
+first:
+    second_a:
+        third: 1
+    second_b: 3
+description: foo
+"""
+        self.assertEqual(monkeyYaml.load(y), yaml.load(y))
 
 
 if __name__ == '__main__':
