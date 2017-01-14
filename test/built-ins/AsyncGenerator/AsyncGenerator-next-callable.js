@@ -6,5 +6,5 @@
  ---*/
 
 async function* foo() { };
-assert("next" in Object.getPrototypeOf(foo()));
+assert.sameValue(foo.hasOwnProperty("next"), true);
 foo().next();
